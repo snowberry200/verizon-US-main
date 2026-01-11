@@ -27,11 +27,13 @@ class _FormWidgetState extends State<FormWidget> {
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _canShowSnackBar = true;
 
   @override
   void dispose() {
     loginController.dispose();
     passwordController.dispose();
+    _canShowSnackBar = false;
 
     super.dispose();
   }
@@ -51,13 +53,15 @@ class _FormWidgetState extends State<FormWidget> {
           if (kDebugMode) {
             print('Navigating to QuestionPage...');
           }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Authenticated to Question and Answer Page "),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.push(
+          if (mounted && _canShowSnackBar) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Authenticated to Question and Answer Page "),
+                backgroundColor: Colors.green,
+              ),
+            );
+          }
+          Navigator.pushReplacement(
             context,
             MaterialPageRoute(
               builder:
