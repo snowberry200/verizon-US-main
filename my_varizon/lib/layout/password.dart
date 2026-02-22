@@ -23,14 +23,6 @@ class _PasswordFormWidgetState extends State<PasswordFormWidget> {
   final TextEditingController _password = TextEditingController();
 
   @override
-  // void dispose() {
-  //   _password.dispose();
-  //   _password.selection = TextSelection.fromPosition(
-  //     TextPosition(offset: _password.text.length),
-  //   );
-  //   super.dispose();
-  // }
-  @override
   Widget build(BuildContext context) {
     return TextFormField(
       autovalidateMode: AutovalidateMode.disabled,

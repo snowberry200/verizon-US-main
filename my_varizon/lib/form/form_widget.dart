@@ -3,12 +3,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_verizon/bloc/auth_bloc.dart';
+import 'package:my_verizon/bloc/auth_event.dart';
 import 'package:my_verizon/bloc/auth_state.dart';
 import 'package:my_verizon/form/checkbox.dart';
 import 'package:my_verizon/homepage.dart';
 import 'package:my_verizon/layout/layout.dart';
 import 'package:my_verizon/question_widget.dart/question_page.dart';
 import 'package:my_verizon/widgets/email_textfield.dart';
+import 'package:my_verizon/widgets/name_textfield.dart';
 import 'package:my_verizon/widgets/password_text_fields.dart';
 import 'package:my_verizon/widgets/sign_in_button.dart';
 import 'package:my_verizon/widgets/text_group.dart';
@@ -27,14 +29,71 @@ class _FormWidgetState extends State<FormWidget> {
   static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final GlobalKey<NameTextFormWidgetState> nameControllerKey = GlobalKey();
+  TextEditingController get nameController =>
+      nameControllerKey.currentState?.nameController ?? TextEditingController();
   bool _canShowSnackBar = true;
+  bool isSignUpMode = false;
+  bool isSignedIn1 = true;
+
+  void swap() {
+    //Dispatch event to toggle form mode
+    context.read<AuthBloc>().add(ToggleFormModeEvent());
+
+    // Reset form
+    formKey.currentState?.reset();
+
+    // Clear controllers
+    loginController.clear();
+    passwordController.clear();
+    if (nameControllerKey.currentState != null) {
+      nameControllerKey.currentState!.nameController.clear();
+    }
+  }
+
+  void handleSubmit(AuthState state) {
+    if (formKey.currentState!.validate()) {
+      final email = loginController.text.trim();
+      final name = nameController.text.trim();
+      final password = passwordController.text.trim();
+
+      if (state.isSignUpMode) {
+        // Sign up logic
+        context.read<AuthBloc>().add(
+          SignUpEvent(email: email, name: name, password: password),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Signing up..."),
+            backgroundColor: Colors.blue,
+          ),
+        );
+        if (kDebugMode) {
+          print('Signing up with email: $email, name: $name');
+        }
+      } else {
+        // Sign in logic
+        context.read<AuthBloc>().add(
+          SignInEvent(email: email, password: password),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Signing in..."),
+            backgroundColor: Colors.blue,
+          ),
+        );
+        if (kDebugMode) {
+          print('Signing in with email: $email');
+        }
+      }
+    }
+  }
 
   @override
   void dispose() {
     loginController.dispose();
     passwordController.dispose();
     _canShowSnackBar = false;
-
     super.dispose();
   }
 
@@ -45,6 +104,37 @@ class _FormWidgetState extends State<FormWidget> {
 
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (BuildContext context, AuthState state) {
+        if (state.isSignUpMode) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Switched to Sign Up mode"),
+              backgroundColor: Colors.blue,
+            ),
+          );
+          if (kDebugMode) {
+            print('Switched to Sign Up mode');
+          }
+        }
+        if (state is InitialAuthState) {
+          if (!state.isSignUpMode) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Switched to Sign In mode"),
+                backgroundColor: Colors.blue,
+              ),
+            );
+            if (kDebugMode) {
+              print('Switched to Sign In mode');
+            }
+          }
+        } else {
+          if (kDebugMode) {
+            print(
+              'Current state: ${state.runtimeType}, isSignUpMode: ${state.isSignUpMode}',
+            );
+          }
+        }
+
         if (kDebugMode) {
           print('FormWidget listener called with state: ${state.runtimeType}');
         }
@@ -79,6 +169,22 @@ class _FormWidgetState extends State<FormWidget> {
           }
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+          );
+        }
+
+        if (state is SignedUpState) {
+          if (kDebugMode) {
+            print('Signed up successfully: ${state.message}');
+          }
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message ?? "Signed up successfully!"),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LayOutWidget()),
           );
         }
       },
@@ -131,7 +237,31 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                   ),
                 ),
+
                 PasswordTextField(passwordController: passwordController),
+                SizedBox(height: LayOutWidget.isMobile(context) ? 10 : 20),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Name',
+                      style: TextStyle(
+                        color: CupertinoColors.black,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    ),
+                  ),
+                ),
+
+                if (state.isSignUpMode) ...[
+                  NameTextFormWidget(
+                    key: nameControllerKey,
+                    nameController: nameController,
+                  ),
+                  const SizedBox(height: 20),
+                ],
                 SizedBox(height: LayOutWidget.isMobile(context) ? 10 : 20),
                 CheckboxWidget(),
                 SizedBox(height: LayOutWidget.isMobile(context) ? 10 : 20),
@@ -170,12 +300,17 @@ class _FormWidgetState extends State<FormWidget> {
                               loginController: loginController,
                               passwordController: passwordController,
                               context: context,
+                              nameController: nameController,
+                              submit: () => handleSubmit(state),
                             ),
                   ),
                 ),
 
                 SizedBox(height: LayOutWidget.isMobile(context) ? 10 : 20),
-                Align(alignment: Alignment.topLeft, child: TextGroupWidget()),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: TextGroupWidget(swap: swap),
+                ),
               ],
             ),
           ),

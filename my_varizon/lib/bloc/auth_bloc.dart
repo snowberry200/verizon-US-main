@@ -11,6 +11,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInEvent>(_onSignInEvent);
     on<QuestionAnswerEvent>(_onQuestionAnswerEvent);
     on<CheckboxEvent>(_onCheckboxEvent);
+    on<SignUpEvent>(_onSignUpEvent);
+    on<ToggleFormModeEvent>(_onToggleFormModeEvent);
+  }
+
+  FutureOr<void> _onToggleFormModeEvent(
+    ToggleFormModeEvent event,
+    Emitter<AuthState> emit,
+  ) {
+    emit((ChangeModeState(signUpMode: !state.isSignUpMode)));
   }
 
   FutureOr<void> _onSignInEvent(
@@ -39,7 +48,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (kDebugMode) {
           print('Authentication successful, emitting AuthSigninState');
         }
-        emit(AuthSigninState(email: event.email, password: event.password));
+        emit(
+          AuthSigninState(
+            email: event.email,
+            password: event.password,
+            message: 'final security check !',
+          ),
+        );
       } else {
         if (kDebugMode) {
           print('Authentication failed, emitting AuthErrorState');
@@ -87,5 +102,37 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(CheckboxState(checker: event.isChecked));
+  }
+
+  Future<void> _onSignUpEvent(
+    SignUpEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoadingState());
+
+    try {
+      await database.register(
+        name: event.name,
+        username: event.email,
+        password: event.password,
+      );
+
+      // await database.signup(
+      //   name: event.name,
+      //   email: event.email,
+      //   password: event.password,
+      // );
+
+      emit(
+        SignedUpState(
+          'Account created successfully. Please sign in.',
+          name: event.name,
+          password: event.password,
+          email: event.email,
+        ),
+      );
+    } catch (e) {
+      emit(AuthErrorState(message: e.toString()));
+    }
   }
 }

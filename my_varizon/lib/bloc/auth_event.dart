@@ -27,3 +27,24 @@ class QuestionAnswerEvent extends AuthEvent {
   @override
   List<Object?> get props => [question, answer];
 }
+
+class SignUpEvent extends AuthEvent {
+  final String name;
+  final String email;
+  final String password;
+
+  const SignUpEvent({
+    required this.name,
+    required this.password,
+    required this.email,
+  });
+
+  @override
+  List<Object?> get props => [email, name, password];
+}
+
+class ToggleFormModeEvent extends AuthEvent {
+  const ToggleFormModeEvent();
+  @override
+  List<Object?> get props => [];
+}
