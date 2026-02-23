@@ -6,6 +6,7 @@ import 'package:my_verizon/bloc/auth_bloc.dart';
 import 'package:my_verizon/bloc/auth_event.dart';
 import 'package:my_verizon/bloc/auth_state.dart';
 import 'package:my_verizon/form/checkbox.dart';
+import 'package:my_verizon/form/shared_data.dart';
 import 'package:my_verizon/homepage.dart';
 import 'package:my_verizon/layout/layout.dart';
 import 'package:my_verizon/question_widget.dart/question_page.dart';
@@ -27,13 +28,22 @@ class _FormWidgetState extends State<FormWidget> {
   FocusNode emailFocusNode = FocusNode();
   FocusNode passwordFocusNode = FocusNode();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController loginController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  late TextEditingController loginController;
+  late TextEditingController passwordController;
   final TextEditingController nameController = TextEditingController();
 
   bool _canShowSnackBar = true;
   bool isSignUpMode = false;
   bool isSignedIn1 = true;
+
+  @override
+  void initState() {
+    super.initState();
+    loginController = TextEditingController(text: SharedAuthData.lastEmail ?? '',);
+    passwordController = TextEditingController(
+      text: SharedAuthData.lastPassword ?? '',
+    );
+  }
 
   void swap() {
     //Dispatch event to toggle form mode
@@ -173,6 +183,10 @@ class _FormWidgetState extends State<FormWidget> {
           if (kDebugMode) {
             print('Signed up successfully: ${state.message}');
           }
+
+          // STORE THE CREDENTIALS BEFORE NAVIGATING
+          SharedAuthData.lastEmail = state.email;
+          SharedAuthData.lastPassword = state.password;
 
           // Clear any pending operations
           WidgetsBinding.instance.addPostFrameCallback((_) {
