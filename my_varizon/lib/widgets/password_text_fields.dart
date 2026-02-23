@@ -27,7 +27,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       key: ValueKey('password'),
-      autovalidateMode: AutovalidateMode.onUserInteraction,
+      autovalidateMode: AutovalidateMode.disabled,
       textAlign: TextAlign.start,
       decoration: InputDecoration(
         fillColor: Colors.transparent,

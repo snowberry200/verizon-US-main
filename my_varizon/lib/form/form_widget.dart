@@ -39,9 +39,11 @@ class _FormWidgetState extends State<FormWidget> {
   @override
   void initState() {
     super.initState();
-    loginController = TextEditingController(text: SharedAuthData.lastEmail ?? '',);
+    loginController = TextEditingController(
+      text: SharedAuthData.lastEmail ?? '',
+    );
     passwordController = TextEditingController(
-      text: SharedAuthData.lastPassword ?? '',
+      text: SharedAuthData.lastPassword,
     );
   }
 
