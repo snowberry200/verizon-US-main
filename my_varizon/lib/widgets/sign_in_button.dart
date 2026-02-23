@@ -12,10 +12,10 @@ class SignInButton extends StatelessWidget {
     required this.passwordController,
     required this.context,
     required this.submit,
-    required this.nameController,
+    //required this.nameController,
   });
 
-  final TextEditingController nameController;
+  //final TextEditingController nameController;
   final GlobalKey<FormState> formKey;
   final TextEditingController loginController;
   final TextEditingController passwordController;

@@ -32,8 +32,11 @@ class _EmailTextFieldState extends State<EmailTextField> {
       textInputAction: TextInputAction.done,
       key: ValueKey('email'),
       controller: widget.loginController,
-      validator: (ifEmail) =>
-          !EmailValidator.validate(ifEmail!) ? 'Enter a valid User ID' : null,
+      validator:
+          (ifEmail) =>
+              !EmailValidator.validate(ifEmail!)
+                  ? 'Enter a valid User ID'
+                  : null,
       decoration: InputDecoration(
         fillColor: Colors.transparent,
         focusedBorder: OutlineInputBorder(

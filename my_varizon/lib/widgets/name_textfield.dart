@@ -1,43 +1,15 @@
 import 'package:flutter/material.dart';
 
 class NameTextFormWidget extends StatefulWidget {
-  final TextEditingController? nameController;
+  final TextEditingController nameController;
 
-  const NameTextFormWidget({super.key, this.nameController});
+  const NameTextFormWidget({super.key, required this.nameController});
 
   @override
   State<NameTextFormWidget> createState() => NameTextFormWidgetState();
 }
 
 class NameTextFormWidgetState extends State<NameTextFormWidget> {
-  // Don't create a new controller, just use the one from widget
-  TextEditingController get _effectiveController =>
-      widget.nameController ?? _fallbackController;
-
-  // Only create a fallback if no controller is provided
-  late final TextEditingController _fallbackController;
-
-  @override
-  void initState() {
-    super.initState();
-    // Only create fallback if needed
-    if (widget.nameController == null) {
-      _fallbackController = TextEditingController();
-    }
-  }
-
-  @override
-  void dispose() {
-    // Only dispose if we created the fallback
-    if (widget.nameController == null) {
-      _fallbackController.dispose();
-    }
-    super.dispose();
-  }
-
-  // Getter to access controller from parent
-  TextEditingController get nameController => _effectiveController;
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -50,7 +22,7 @@ class NameTextFormWidgetState extends State<NameTextFormWidget> {
         return null;
       },
       textAlign: TextAlign.start,
-      controller: _effectiveController,
+      controller: widget.nameController,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.only(left: 10, right: 10),
         border: OutlineInputBorder(borderSide: const BorderSide()),

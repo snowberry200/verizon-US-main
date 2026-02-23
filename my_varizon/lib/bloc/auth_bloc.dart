@@ -117,12 +117,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
       );
 
-      // await database.signup(
-      //   name: event.name,
-      //   email: event.email,
-      //   password: event.password,
-      // );
-
       emit(
         SignedUpState(
           'Account created successfully. Please sign in.',

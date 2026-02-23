@@ -26,12 +26,11 @@ class FormWidget extends StatefulWidget {
 class _FormWidgetState extends State<FormWidget> {
   FocusNode emailFocusNode = FocusNode();
   FocusNode passwordFocusNode = FocusNode();
-  static final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController loginController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final GlobalKey<NameTextFormWidgetState> nameControllerKey = GlobalKey();
-  TextEditingController get nameController =>
-      nameControllerKey.currentState?.nameController ?? TextEditingController();
+  final TextEditingController nameController = TextEditingController();
+
   bool _canShowSnackBar = true;
   bool isSignUpMode = false;
   bool isSignedIn1 = true;
@@ -46,9 +45,7 @@ class _FormWidgetState extends State<FormWidget> {
     // Clear controllers
     loginController.clear();
     passwordController.clear();
-    if (nameControllerKey.currentState != null) {
-      nameControllerKey.currentState!.nameController.clear();
-    }
+    nameController.clear();
   }
 
   void handleSubmit(AuthState state) {
@@ -176,16 +173,25 @@ class _FormWidgetState extends State<FormWidget> {
           if (kDebugMode) {
             print('Signed up successfully: ${state.message}');
           }
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message ?? "Signed up successfully!"),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => LayOutWidget()),
-          );
+
+          // Clear any pending operations
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    state.message ?? "Signed up successfully! Please sign in.",
+                  ),
+                  backgroundColor: Colors.green,
+                ),
+              );
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LayOutWidget()),
+              );
+            }
+          });
         }
       },
       builder: (context, state) {
@@ -256,10 +262,7 @@ class _FormWidgetState extends State<FormWidget> {
                 ),
 
                 if (state.isSignUpMode) ...[
-                  NameTextFormWidget(
-                    key: nameControllerKey,
-                    nameController: nameController,
-                  ),
+                  NameTextFormWidget(nameController: nameController),
                   const SizedBox(height: 20),
                 ],
                 SizedBox(height: LayOutWidget.isMobile(context) ? 10 : 20),
@@ -300,7 +303,7 @@ class _FormWidgetState extends State<FormWidget> {
                               loginController: loginController,
                               passwordController: passwordController,
                               context: context,
-                              nameController: nameController,
+                              //nameController: nameController,
                               submit: () => handleSubmit(state),
                             ),
                   ),
