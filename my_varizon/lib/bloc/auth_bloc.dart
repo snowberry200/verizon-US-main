@@ -3,10 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_verizon/bloc/auth_event.dart';
 import 'package:my_verizon/bloc/auth_state.dart';
-import 'package:my_verizon/database/database.dart';
+import 'package:my_verizon/auth_service/auth_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final Database database;
+  final AuthService database;
   AuthBloc({required this.database}) : super(InitialAuthState()) {
     on<SignInEvent>(_onSignInEvent);
     on<QuestionAnswerEvent>(_onQuestionAnswerEvent);
@@ -68,7 +68,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       if (kDebugMode) {
         print('Error in sign in: $e');
-      } // Debug print
+      }
       emit(AuthErrorState(message: e.toString()));
     }
   }

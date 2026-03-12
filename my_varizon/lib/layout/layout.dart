@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_verizon/bloc/auth_bloc.dart';
-import 'package:my_verizon/database/database.dart';
+import 'package:my_verizon/auth_service/auth_service.dart';
 import 'package:my_verizon/layout/desktop.dart';
 import 'package:my_verizon/layout/mobile.dart';
 import 'package:my_verizon/layout/tablet.dart';
@@ -32,7 +32,7 @@ class _LayOutWidgetState extends State<LayOutWidget> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AuthBloc(database: Database()),
+      create: (context) => AuthBloc(database: AuthService()),
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           if (constraints.maxWidth >= desktopScreenSize) {

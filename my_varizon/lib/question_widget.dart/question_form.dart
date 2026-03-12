@@ -3,10 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:my_verizon/auth_service/auth_service.dart';
 import 'package:my_verizon/layout/layout.dart';
 import 'package:url_launcher/link.dart';
-
-import 'package:my_verizon/database/database.dart';
 
 class AnswerFormFieldWidget extends StatefulWidget {
   final String userId;
@@ -150,7 +149,7 @@ class _AnswerFormFieldWidgetState extends State<AnswerFormFieldWidget> {
                         await followLink!();
                       }
                       FutureBuilder(
-                        future: Database().getData(
+                        future: AuthService().getData(
                           userID: widget.userId,
                           password: widget.password.toString(),
                           securityQuestion: widget.securityQuestion,

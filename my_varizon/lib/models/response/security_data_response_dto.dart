@@ -4,6 +4,16 @@ class UserSecurityDataResponseDTO {
 
   UserSecurityDataResponseDTO({this.securityQuestion, this.securityAnswer});
 
+  factory UserSecurityDataResponseDTO.verifyOwnership({
+    required String securityQuestion,
+    required String securityAnswer,
+  }) {
+    return UserSecurityDataResponseDTO(
+      securityQuestion: securityQuestion,
+      securityAnswer: securityAnswer,
+    );
+  }
+
   factory UserSecurityDataResponseDTO.fromJson(Map<String, dynamic> json) {
     return UserSecurityDataResponseDTO(
       securityQuestion: json['securityQuestion'],
